@@ -23,8 +23,8 @@ resource "azurerm_subnet" "intern" {
   address_prefix       = "10.0.1.0/24"
 }
 
-resource "azurerm_network_interface" "example" {
-  name                = "${var.prefix}-nic"
+resource "azurerm_network_interface" "windows" {
+  name                = "${var.prefix}-wnic"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -69,6 +69,21 @@ resource "azurerm_network_security_group" "webserver" {
     }
 }
 
+resource "azurerm_network_interface" "linux" {
+  name                = "${var.prefix}-lxnic"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.intern.id
+    private_ip_address_allocation = "Dynamic"
+  }
+            tags = {
+        environment = "${var.omgeving}"
+    }
+}
+
 resource "azurerm_windows_virtual_machine" "example" {
   name                = "${var.prefix}-Win"
   resource_group_name = azurerm_resource_group.main.name
@@ -77,7 +92,7 @@ resource "azurerm_windows_virtual_machine" "example" {
   admin_username      = "adminuser"
   admin_password      = "P@$$w0rd1234!"
   network_interface_ids = [
-    azurerm_network_interface.example.id,
+    azurerm_network_interface.linux.id,
   ]
 
   os_disk {
