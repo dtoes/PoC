@@ -39,7 +39,7 @@ resource "azurerm_network_interface" "example" {
 }
 
 resource "azurerm_windows_virtual_machine" "example" {
-  name                = "${var.prefix}-Windowsmachine"
+  name                = "${var.prefix}-Win"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   size                = "Standard_F2"
