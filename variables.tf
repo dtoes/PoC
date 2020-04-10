@@ -10,7 +10,7 @@ variable "location" {
 
 variable "omgeving" {
   description = "Soort omgeving zoals test,dev of productie"
-  default = "ProofofConcept"
+  default = "Test"
 }
 
 variable "gebruikersnaam" {
