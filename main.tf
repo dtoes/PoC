@@ -91,9 +91,7 @@ resource "azurerm_windows_virtual_machine" "example" {
   size                = "Standard_F2"
   admin_username      = "adminuser"
   admin_password      = "P@$$w0rd1234!"
-  network_interface_ids = [
-    azurerm_network_interface.linux.id,
-  ]
+  network_interface_ids = [azurerm_network_interface.windows.id]
 
   os_disk {
     caching              = "ReadWrite"
@@ -115,7 +113,7 @@ resource "azurerm_virtual_machine" "example" {
   name                  = "${var.prefix}-lx"
   location              = azurerm_resource_group.main.location
   resource_group_name   = azurerm_resource_group.main.name
-  network_interface_ids = [azurerm_network_interface.example.id]
+  network_interface_ids = [azurerm_network_interface.linux.id]
   vm_size               = "Standard_F2"
 
   storage_image_reference {
