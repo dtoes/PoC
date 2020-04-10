@@ -21,6 +21,9 @@ resource "azurerm_subnet" "intern" {
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefix       = "10.0.1.0/24"
+          tags = {
+        environment = "${var.omgeving}"
+    }
 }
 
 resource "azurerm_network_interface" "example" {
@@ -33,10 +36,13 @@ resource "azurerm_network_interface" "example" {
     subnet_id                     = azurerm_subnet.intern.id
     private_ip_address_allocation = "Dynamic"
   }
+            tags = {
+        environment = "${var.omgeving}"
+    }
 }
 
 resource "azurerm_windows_virtual_machine" "example" {
-  name                = "${var.prefix}-machine"
+  name                = "${var.prefix}-Windowsmachine"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   size                = "Standard_F2"
@@ -45,7 +51,7 @@ resource "azurerm_windows_virtual_machine" "example" {
   network_interface_ids = [
     azurerm_network_interface.example.id,
   ]
-  
+
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
@@ -57,5 +63,38 @@ resource "azurerm_windows_virtual_machine" "example" {
     sku       = "2016-Datacenter"
     version   = "latest"
   }
+            tags = {
+        environment = "${var.omgeving}"
+    }
 }
 
+resource "azurerm_network_security_group" "webserver" {
+  name                = "http_webserver"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  security_rule {
+    access                     = "Allow"
+    direction                  = "Inbound"
+    name                       = "http"
+    priority                   = 100
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    source_address_prefix      = "*"
+    destination_port_range     = "80"
+    destination_address_prefix = azurerm_subnet.intern.address_prefix
+  }
+    security_rule {
+    access                     = "Allow"
+    direction                  = "Inbound"
+    name                       = "ssh"
+    priority                   = 110
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    source_address_prefix      = "*"
+    destination_port_range     = "22"
+    destination_address_prefix = azurerm_subnet.intern.address_prefix
+  }
+        tags = {
+        environment = "${var.omgeving}"
+    }
+}
