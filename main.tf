@@ -38,33 +38,6 @@ resource "azurerm_network_interface" "example" {
     }
 }
 
-resource "azurerm_windows_virtual_machine" "example" {
-  name                = "${var.prefix}-Win"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-  size                = "Standard_F2"
-  admin_username      = "adminuser"
-  admin_password      = "P@$$w0rd1234!"
-  network_interface_ids = [
-    azurerm_network_interface.example.id,
-  ]
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-  }
-
-  source_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2016-Datacenter"
-    version   = "latest"
-  }
-            tags = {
-        environment = "${var.omgeving}"
-    }
-}
-
 resource "azurerm_network_security_group" "webserver" {
   name                = "http_webserver"
   location            = azurerm_resource_group.main.location
@@ -92,6 +65,68 @@ resource "azurerm_network_security_group" "webserver" {
     destination_address_prefix = azurerm_subnet.intern.address_prefix
   }
         tags = {
+        environment = "${var.omgeving}"
+    }
+}
+
+resource "azurerm_windows_virtual_machine" "example" {
+  name                = "${var.prefix}-Win"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  size                = "Standard_F2"
+  admin_username      = "adminuser"
+  admin_password      = "P@$$w0rd1234!"
+  network_interface_ids = [
+    azurerm_network_interface.example.id,
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2016-Datacenter"
+    version   = "latest"
+  }
+            tags = {
+        environment = "${var.omgeving}"
+    }
+}
+
+resource "azurerm_virtual_machine" "example" {
+  name                  = "${var.prefix}-lx"
+  location              = azurerm_resource_group.main.location
+  resource_group_name   = azurerm_resource_group.main.name
+  network_interface_ids = [azurerm_network_interface.example.id]
+  vm_size               = "Standard_F2"
+
+  storage_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "16.04-LTS"
+    version   = "latest"
+  }
+
+  storage_os_disk {
+    name              = "myosdisk1"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  os_profile {
+    computer_name  = "Linux machine"
+    admin_username = "testadmin"
+    admin_password = "Password1234!"
+  }
+
+  os_profile_linux_config {
+    disable_password_authentication = false
+  }
+            tags = {
         environment = "${var.omgeving}"
     }
 }
