@@ -22,6 +22,16 @@ resource "azurerm_subnet" "intern" {
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefix       = "10.0.1.0/24"
 }
+resource "azurerm_public_ip" "mypublicip" {
+    name                         = "${var.prefix}-pip"
+    location                     = azurerm_resource_group.main.location
+    resource_group_name          = azurerm_resource_group.main.name
+    allocation_method            = "static"
+
+    tags = {
+        environment = "${var.omgeving}"
+    }
+}
 
 resource "azurerm_network_interface" "windows" {
   name                = "${var.prefix}-wnic"
@@ -32,6 +42,7 @@ resource "azurerm_network_interface" "windows" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.intern.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.mypublicip.id
   }
             tags = {
         environment = "${var.omgeving}"
@@ -47,12 +58,12 @@ resource "azurerm_network_interface" "linux" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.intern.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.mypublicip.id
   }
             tags = {
         environment = "${var.omgeving}"
     }
 }
-
 
 resource "azurerm_network_security_group" "webserver" {
   name                = "http_webserver"
@@ -78,6 +89,17 @@ resource "azurerm_network_security_group" "webserver" {
     source_port_range          = "*"
     source_address_prefix      = "*"
     destination_port_range     = "22"
+    destination_address_prefix = azurerm_subnet.intern.address_prefix
+  }
+    security_rule {
+    access                     = "Allow"
+    direction                  = "Inbound"
+    name                       = "rdp"
+    priority                   = 110
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    source_address_prefix      = "*"
+    destination_port_range     = "3389"
     destination_address_prefix = azurerm_subnet.intern.address_prefix
   }
         tags = {
@@ -141,13 +163,7 @@ resource "azurerm_virtual_machine" "example" {
     disable_password_authentication = false
   }
 
-  provisioner "remote-exec" {
-  inline = [
-      "sudo yum -y install nginx",
-      "sudo systemctl start nginx",
-    ]
-  }
-            tags = {
-        environment = "${var.omgeving}"
+  tags = {
+    environment = "${var.omgeving}"
     }
 }
