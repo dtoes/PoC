@@ -106,7 +106,7 @@ resource "azurerm_network_security_group" "webserver" {
     access                     = "Allow"
     direction                  = "Inbound"
     name                       = "rdp"
-    priority                   = 110
+    priority                   = 120
     protocol                   = "Tcp"
     source_port_range          = "*"
     source_address_prefix      = "*"
