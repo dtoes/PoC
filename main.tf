@@ -140,6 +140,13 @@ resource "azurerm_virtual_machine" "example" {
   os_profile_linux_config {
     disable_password_authentication = false
   }
+
+  provisioner "remote-exec" {
+  inline = [
+      "sudo yum -y install nginx",
+      "sudo systemctl start nginx",
+    ]
+  }
             tags = {
         environment = "${var.omgeving}"
     }
