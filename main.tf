@@ -34,7 +34,7 @@ resource "azurerm_public_ip" "mypublicwindowsip" {
 }
 
 resource "azurerm_public_ip" "mypubliclinuxip" {
-    name                         = "${var.prefix}-lpip"
+    name                         = "${var.prefix}-lxpip"
     location                     = azurerm_resource_group.main.location
     resource_group_name          = azurerm_resource_group.main.name
     allocation_method            = "Static"
