@@ -33,7 +33,7 @@ resource "azurerm_public_ip" "mypublicwindowsip" {
     }
 }
 
-resource "azurerm_public_ip" "mypubliclinuxsip" {
+resource "azurerm_public_ip" "mypubliclinuxip" {
     name                         = "${var.prefix}-lpip"
     location                     = azurerm_resource_group.main.location
     resource_group_name          = azurerm_resource_group.main.name
