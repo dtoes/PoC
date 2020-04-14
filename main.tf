@@ -22,8 +22,19 @@ resource "azurerm_subnet" "intern" {
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefix       = "10.0.1.0/24"
 }
-resource "azurerm_public_ip" "mypublicip" {
-    name                         = "${var.prefix}-pip"
+resource "azurerm_public_ip" "mypublicwindowsip" {
+    name                         = "${var.prefix}-wpip"
+    location                     = azurerm_resource_group.main.location
+    resource_group_name          = azurerm_resource_group.main.name
+    allocation_method            = "Static"
+
+    tags = {
+        environment = "${var.omgeving}"
+    }
+}
+
+resource "azurerm_public_ip" "mypubliclinuxsip" {
+    name                         = "${var.prefix}-lpip"
     location                     = azurerm_resource_group.main.location
     resource_group_name          = azurerm_resource_group.main.name
     allocation_method            = "Static"
@@ -42,7 +53,7 @@ resource "azurerm_network_interface" "windows" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.intern.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.mypublicip.id
+    public_ip_address_id          = azurerm_public_ip.mypublicwindowsip.id
   }
             tags = {
         environment = "${var.omgeving}"
@@ -58,7 +69,7 @@ resource "azurerm_network_interface" "linux" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.intern.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.mypublicip.id
+    public_ip_address_id          = azurerm_public_ip.mypubliclinuxip.id
   }
             tags = {
         environment = "${var.omgeving}"
